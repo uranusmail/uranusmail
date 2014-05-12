@@ -1,15 +1,32 @@
 module Uranusmail
   class Config < Hash
 
+    DEFAULT_CONFIG = {
+      uranusmail: {
+        date_format: "%d.%m.%y %H:%M:%S",
+        count_threads: false,
+      },
+    }
+
     attr_reader :contents
 
     def initialize(contents)
       @contents = contents
 
+      set_defaults
       parse_config
     end
 
     private
+
+    def set_defaults
+      DEFAULT_CONFIG.each do |group, keys|
+        keys.each do |key, value|
+          self[group] ||= {}
+          self[group][key] = value
+        end
+      end
+    end
 
     def parse_config
       group = nil

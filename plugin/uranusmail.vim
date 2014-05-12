@@ -59,7 +59,6 @@ let s:uranusmail_folders_default = [
   \ [ 'unread', 'tag:unread' ],
   \ ]
 
-let s:uranusmail_date_format_default = '%d.%m.%y %H:%M:%S'
 let s:notmuch_config = expand("~/.notmuch-config")
 
 function! s:set_defaults()
@@ -69,11 +68,6 @@ function! s:set_defaults()
 
   if !exists('g:uranusmail_folders')
     let g:uranusmail_folders = s:uranusmail_folders_default
-  endif
-
-
-  if !exists('g:uranusmail_date_format')
-    let g:uranusmail_date_format = s:uranusmail_date_format_default
   endif
 endfunction
 
@@ -130,10 +124,7 @@ endfunction
 function! s:show(thread_id)
   call s:new_buffer('show')
   setlocal modifiable
-ruby << EOF
-  options = {date_fmt: VIM::evaluate('g:uranusmail_date_format')}
-  $uranusmail.render_thread(VIM::evaluate('a:thread_id'), options)
-EOF
+  ruby $uranusmail.render_thread(VIM::evaluate('a:thread_id'))
   setlocal nomodifiable
   call s:set_map(g:uranusmail_show_maps)
 endfunction
@@ -146,10 +137,7 @@ endfunction
 
 function! s:search(search)
   call s:new_buffer('search')
-ruby << EOF
-  options = {date_fmt: VIM::evaluate('g:uranusmail_date_format')}
-  $uranusmail.render_search(VIM::evaluate('a:search'), options)
-EOF
+  ruby $uranusmail.render_search(VIM::evaluate('a:search'))
   call s:set_menu_buffer()
   call s:set_map(g:uranusmail_search_maps)
   autocmd CursorMoved <buffer> call s:show_cursor_moved()

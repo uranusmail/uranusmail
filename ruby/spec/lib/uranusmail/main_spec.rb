@@ -24,7 +24,7 @@ module Uranusmail
       end
 
       it "should count the messages for inbox" do
-        Main.instance.config[:vim][:count_threads] = false
+        Main.instance.config[:uranusmail][:count_threads] = false
 
         Main.instance.render_folders(@folders)
         $curbuf.content.should include("       52 inbox                (tag:inbox)")
@@ -37,22 +37,18 @@ module Uranusmail
     end
 
     context "#render_search" do
-      before do
-        @options = { date_fmt: "%d.%m.%y %H:%M:%S" }
-      end
-
       it "should render in UTF-8" do
-        Main.instance.render_search("tag:inbox", @options)
+        Main.instance.render_search("tag:inbox")
         $curbuf.content[1].encoding.to_s.should == 'UTF-8'
       end
 
       it "should render the full search" do
-        Main.instance.render_search("tag:inbox", @options)
+        Main.instance.render_search("tag:inbox")
         $curbuf.content.size.should == $curwin.height + 2
       end
 
       it "should load more when we are on the 7th line" do
-        Main.instance.render_search("tag:inbox", @options)
+        Main.instance.render_search("tag:inbox")
 
         $curbuf.load_more?.should be_false
 
@@ -61,20 +57,20 @@ module Uranusmail
       end
 
       it "should load them all after invoking do_next" do
-        Main.instance.render_search("tag:inbox", @options)
+        Main.instance.render_search("tag:inbox")
         $curbuf.do_next
         $curbuf.content.size.should == 24
       end
 
       it "should be able to toggle select on threads" do
-        Main.instance.render_search("tag:inbox", @options)
+        Main.instance.render_search("tag:inbox")
         $curbuf.content[1].should =~ /^ .*/
         $curbuf.toggle_select_thread
         $curbuf.content[1].should =~ /^>.*/
       end
 
       it "should be able to unselect all threads" do
-        Main.instance.render_search("tag:inbox", @options)
+        Main.instance.render_search("tag:inbox")
         $curbuf.line_number = 2
         $curbuf.toggle_select_thread
         $curbuf.line_number = 1
@@ -87,12 +83,11 @@ module Uranusmail
 
     context "#render_thread" do
       before do
-        @options = { date_fmt: "%d.%m.%y %H:%M:%S" }
         @thread_id = "0000000000000001"
       end
 
       it "should render all the messages" do
-        Main.instance.render_thread(@thread_id, @options)
+        Main.instance.render_thread(@thread_id)
         $curbuf.content.join("\n").should =~ /Resulted in 4604/
       end
     end

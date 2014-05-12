@@ -118,14 +118,6 @@ You can also configure the keyboard mappings for the different views:
 		\ 'd':		'show_tag("+deleted -inbox -unread")',
 		\ }
 <
-
-						*g:uranusmail_date_format*
-
-To configure the date format:
->
-	let g:uranusmail_date_format = '%d.%m.%y'
-<
-
 						*g:uranusmail_reader*
 						*g:uranusmail_sendmail*
 

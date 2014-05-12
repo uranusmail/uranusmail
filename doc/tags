@@ -1,6 +1,5 @@
 g:uranusmail_custom_search_maps	uranusmail.txt	/*g:uranusmail_custom_search_maps*
 g:uranusmail_custom_show_maps	uranusmail.txt	/*g:uranusmail_custom_show_maps*
-g:uranusmail_date_format	uranusmail.txt	/*g:uranusmail_date_format*
 g:uranusmail_folders	uranusmail.txt	/*g:uranusmail_folders*
 g:uranusmail_reader	uranusmail.txt	/*g:uranusmail_reader*
 g:uranusmail_sendmail	uranusmail.txt	/*g:uranusmail_sendmail*
