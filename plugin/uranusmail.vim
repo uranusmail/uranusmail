@@ -124,7 +124,6 @@ endfunction
 
 function! s:show(thread_id)
   call s:new_buffer('show')
-  setlocal modifiable
 ruby << EOF
   options = {date_fmt: VIM::evaluate('g:uranusmail_date_format')}
   $uranusmail.render_thread(VIM::evaluate('a:thread_id'), options)
