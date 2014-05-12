@@ -1,0 +1,23 @@
+language: ruby
+before_install:
+  - cd ..
+  - sudo apt-get update -qq
+  - wget 'https://launchpad.net/ubuntu/+archive/primary/+files/zlib1g-dev_1.2.8.dfsg-1ubuntu1_amd64.deb'
+  - wget 'https://launchpad.net/ubuntu/+archive/primary/+files/zlib1g_1.2.8.dfsg-1ubuntu1_amd64.deb'
+  - sudo dpkg -i zlib1g-dev_1.2.8.dfsg-1ubuntu1_amd64.deb zlib1g_1.2.8.dfsg-1ubuntu1_amd64.deb
+  - sudo apt-get install -f
+  - sudo apt-get install dtach libxapian-dev libgmime-2.6-dev libtalloc-dev python-sphinx ruby1.9.1-full elinks
+  - git clone https://github.com/notmuch/notmuch.git
+  - cd notmuch
+  - ./configure --prefix=/usr
+  - make
+  - sudo make install
+  - cd bindings/ruby
+  - ruby1.9.1 --version
+  - ruby1.9.1 extconf.rb --vendor
+  - make
+  - cd ../../../uranusmail/ruby
+  - cp ../../notmuch/bindings/ruby/notmuch.so lib/
+
+rvm:
+  - 1.9.3

@@ -1,0 +1,137 @@
+*uranusmail.txt*	Plug-in to make vim a nice email client using uranusmail
+
+Author: Felipe Contreras <felipe.contreras@gmail.com>
+
+Overview 					|uranusmail-intro|
+Usage						|uranusmail-usage|
+Mappings					|uranusmail-mappings|
+Configuration					|uranusmail-config|
+
+==============================================================================
+OVERVIEW					*uranusmail-intro*
+
+This is a vim plug-in that provides a fully usable mail client interface,
+utilizing the notmuch framework.
+
+It has three main views: folders, search, and thread. In the folder view you
+can find a summary of saved searches, In the search view you can see all the
+threads that comprise the selected search, and in the thread view you can read
+every mail in the thread.
+
+==============================================================================
+USAGE						*uranusmail-usage*
+
+To use it, simply run the `:Uranusmail` command.
+
+By default you start in the folder view which shows you default searches and
+the number of threads that match those:
+>
+	10 new                  (tag:inbox and tag:unread)
+	20 inbox                (tag:inbox)
+	30 unread               (tag:unread)
+<
+You can see the threads of each by clicking `enter`, which sends you to the
+search view. In both the search and folder views you can type `s` to type a
+new search, or `=` to refresh. To see a thread, type `enter` again.
+
+To exit a view, click `q`, to exit uranusmail simply exit vim.
+
+Also, you can specify a search directly:
+>
+	:Uranusmail is:inbox and date:yesterday..
+<
+==============================================================================
+MAPPINGS					*uranusmail-mappings*
+
+------------------------------------------------------------------------------
+Folder view~
+
+<enter>	Show selected search
+s	Enter a new search
+=	Refresh
+c	Compose a new mail
+
+------------------------------------------------------------------------------
+Search view~
+
+q	Quit view
+<enter>	Show selected search
+<space>	Show selected search with filter
+A	Archive (-inbox -unread)
+I	Mark as read (-unread)
+t	Tag (prompted)
+s	Search
+=	Refresh
+?	Show search information
+c	Compose a new mail
+>
+------------------------------------------------------------------------------
+Thread view~
+
+q	Quit view
+A	Archive (-inbox -unread)
+I	Mark as read (-unread)
+t	Tag (prompted)
+s	Search
+p	Save patches
+r	Reply
+?	Show thread information
+<tab>	Show next message
+c	Compose a new mail
+
+------------------------------------------------------------------------------
+Compose view~
+
+q	Quit view
+s	Send
+
+==============================================================================
+CONFIGURATION					*uranusmail-config*
+
+You can add the following configurations to your `.vimrc`
+
+						*g:uranusmail_folders*
+
+The first thing you might want to do is set your custom searches.
+>
+	let g:uranusmail_folders = [
+		\ [ 'new', 'tag:inbox and tag:unread' ],
+		\ [ 'inbox', 'tag:inbox' ],
+		\ [ 'unread', 'tag:unread' ],
+		\ [ 'to-do', 'tag:to-do' ],
+		\ [ 'to-me', 'to:john.doe and tag:new' ],
+		\ ]
+<
+
+						*g:uranusmail_custom_search_maps*
+						*g:uranusmail_custom_show_maps*
+
+You can also configure the keyboard mappings for the different views:
+>
+	let g:uranusmail_custom_search_maps = {
+		\ 't':		'search_tag("+to-do -inbox")',
+		\ 'd':		'search_tag("+deleted -inbox -unread")',
+		\ }
+
+	let g:uranusmail_custom_show_maps = {
+		\ 't':		'show_tag("+to-do -inbox")',
+		\ 'd':		'show_tag("+deleted -inbox -unread")',
+		\ }
+<
+
+						*g:uranusmail_date_format*
+
+To configure the date format:
+>
+	let g:uranusmail_date_format = '%d.%m.%y'
+<
+
+						*g:uranusmail_reader*
+						*g:uranusmail_sendmail*
+
+You can also configure your sendemail program:
+>
+	let g:uranusmail_sendmail = 'sendmail'
+<
+
+vim:tw=78:ts=8:noet:ft=help:
