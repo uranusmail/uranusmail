@@ -17,6 +17,12 @@ let g:uranusmail_folders_maps = {
   \ ';'       : 'list_buffers()',
   \ }
 
+let g:uranusmail_buffers_maps = {
+  \ 'q'       : 'kill_this_buffer()',
+  \ '<Enter>' : 'open_selected_buffer()',
+  \ '='       : 'buffers_refresh()',
+  \ }
+
 let g:uranusmail_search_maps = {
   \ 'q'       : 'kill_this_buffer()',
   \ '<Enter>' : 'search_show_thread()',
@@ -75,6 +81,36 @@ function! s:set_defaults()
   if !exists('g:uranusmail_date_format')
     let g:uranusmail_date_format = s:uranusmail_date_format_default
   endif
+endfunction
+
+function! s:list_buffers()
+  call s:new_buffer('buffers')
+  ruby $uranusmail.render_buffers_list
+  call s:set_menu_buffer()
+  call s:set_map(g:uranusmail_buffers_maps)
+endfunction
+
+function! s:open_selected_buffer()
+ruby << EOF
+  buffers_list_id = $curbuf.number
+  buffer_id = $curbuf.line_info[:buffer_id]
+  VIM::command("call s:kill_this_buffer()")
+  VIM::command("buffer #{buffer_id}")
+EOF
+endfunction
+
+function! s:kill_buffer(buffer_id)
+ruby  << EOF
+  buffer_id = VIM::evaluate("a:buffer_id")
+  VIM::Buffer[buffer_id - 1].destroy!
+  VIM::command("bdelete! #{buffer_id}")
+EOF
+endfunction
+
+function! s:buffers_refresh()
+  setlocal modifiable
+  ruby $uranusmail.render_buffers_list
+  setlocal nomodifiable
 endfunction
 
 function! s:set_map(maps)

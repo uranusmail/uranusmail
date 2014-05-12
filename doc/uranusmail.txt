@@ -50,6 +50,7 @@ Folder view~
 s	Enter a new search
 =	Refresh
 c	Compose a new mail
+;	List buffers
 
 ------------------------------------------------------------------------------
 Search view~
@@ -64,6 +65,7 @@ s	Search
 =	Refresh
 ?	Show search information
 c	Compose a new mail
+;	List buffers
 >
 ------------------------------------------------------------------------------
 Thread view~
@@ -78,12 +80,21 @@ r	Reply
 ?	Show thread information
 <tab>	Show next message
 c	Compose a new mail
+;	List buffers
 
 ------------------------------------------------------------------------------
 Compose view~
 
 q	Quit view
 s	Send
+;	List buffers
+
+------------------------------------------------------------------------------
+Buffer list view~
+
+q	Quit view
+<enter>	Open the selected buffer
+=	Refresh buffers
 
 ==============================================================================
 CONFIGURATION					*uranusmail-config*

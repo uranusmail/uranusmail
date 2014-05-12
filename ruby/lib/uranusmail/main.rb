@@ -92,6 +92,19 @@ module Uranusmail
       end
     end
 
+    def render_buffers_list
+      $curbuf.render do |curbuf|
+        (0...VIM::Buffer.count).each do |buffer_index|
+          buffer = VIM::Buffer[buffer_index]
+          if buffer && buffer.uranusmail_buffer? && buffer.type != "buffers"
+            line = "%d: %s" % [buffer_index + 1, buffer.type]
+            line << " (#{buffer.query})" if buffer.query
+            curbuf.insert(line, buffer_id: buffer_index + 1)
+          end
+        end
+      end
+    end
+
     private
 
     def count_threads?
