@@ -96,9 +96,7 @@ endfunction
 
 function! s:toggle_select_thread()
   setlocal modifiable
-ruby << EOF
-  $curbuf.toggle_select_thread
-EOF
+  ruby $curbuf.toggle_select_thread
   normal j
   setlocal nomodifiable
 endfunction
@@ -110,10 +108,7 @@ function! s:set_menu_buffer()
 endfunction
 
 function! s:folders_show_search()
-ruby << EOF
-  search = $curbuf.line_info[:search]
-  VIM::command("call s:search('#{search}')")
-EOF
+  ruby VIM::command("call s:search('#{$curbuf.line_info[:search]}')")
 endfunction
 
 function! s:cannot_kill_this_buffer()
@@ -122,8 +117,8 @@ endfunction
 
 function! s:kill_this_buffer()
 ruby << EOF
-	$curbuf.destroy!
-	VIM::command("bdelete!")
+  $curbuf.destroy!
+  VIM::command("bdelete!")
 EOF
 endfunction
 
@@ -139,9 +134,7 @@ EOF
 endfunction
 
 function! s:search_show_thread()
-ruby << EOF
-  VIM::command("call s:show('#{$curbuf.line_info[:thread_id]}')")
-EOF
+  ruby VIM::command("call s:show('#{$curbuf.line_info[:thread_id]}')")
 endfunction
 
 function! s:search(search)
@@ -167,11 +160,7 @@ endfunction
 
 function! s:folders()
   call s:new_buffer('folders')
-
-ruby << EOF
-  $uranusmail.render_folders(VIM::evaluate('g:uranusmail_folders'))
-EOF
-
+  ruby $uranusmail.render_folders(VIM::evaluate('g:uranusmail_folders'))
   call s:set_menu_buffer()
   call s:set_map(g:uranusmail_folders_maps)
 endfunction
