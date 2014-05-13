@@ -3,7 +3,7 @@ require "set"
 module VIM
   class Buffer
 
-    attr_accessor :query, :type
+    attr_accessor :query, :type, :thread
 
     def init(type)
       @type = type

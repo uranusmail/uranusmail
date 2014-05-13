@@ -59,6 +59,7 @@ module Uranusmail
       thread.load_messages!
 
       tags = thread.db_entry.tags.map(&:to_s).join(" ")
+      $curbuf.thread = thread.to_s
 
       $curbuf.render do |buffer|
         thread.messages.each do |msg|
@@ -83,7 +84,10 @@ module Uranusmail
           buffer = VIM::Buffer[buffer_index]
           if buffer && buffer.uranusmail_buffer? && buffer.type != "buffers"
             line = "%d: %s" % [buffer_index + 1, buffer.type]
+
             line << " (#{buffer.query})" if buffer.query
+            line << " #{buffer.thread}"  if buffer.thread
+
             curbuf.insert(line, buffer_id: buffer_index + 1)
           end
         end

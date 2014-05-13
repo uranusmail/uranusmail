@@ -16,6 +16,10 @@ module VIM
       @content = [nil] # VIM buffer index starts at 1
       @line_number = 1
       @query = options[:query]
+
+      if options[:thread_id]
+        @thread = Uranusmail::MailThread.new(thread_id: options[:thread_id]).to_s
+      end
     end
 
     def self.count
