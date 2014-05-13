@@ -48,7 +48,7 @@ module Uranusmail
       $curbuf.continous_render(threads) do |buffer, threads|
         threads.each do |db_entry|
           thread = MailThread.new(db_entry: db_entry)
-          line = " #{thread.to_s}"
+          line = " #{thread}"
           buffer.insert line, {thread_id: thread.thread_id}
         end
       end

@@ -95,13 +95,15 @@ module Uranusmail
         Main.instance.render_thread(@thread_id)
         @mt = MailThread.new(thread_id: @thread_id)
 
-        $curbuf.thread = @mt.to_s
+        $curbuf.thread.should == @mt.to_s
       end
     end
 
     context "#render_buffers_list" do
       before do
         @thread_id = "0000000000000001"
+        @mt = MailThread.new(thread_id: @thread_id)
+
         VIM::Buffer.new(query: "tag:inbox").init("search")
         VIM::Buffer.new(thread_id: @thread_id).init("show")
         VIM::Buffer.new.init("buffers")
@@ -120,8 +122,7 @@ module Uranusmail
 
       it "should show the thread for the show" do
         Main.instance.render_buffers_list
-        $curbuf.content[3].should ==
-          "3: show 18.11.09 02:08:10   7 Lars Kellogg-Stedman | [notmuch] Working with Maildir storage? (inbox signed unread)"
+        $curbuf.content[3].should == "3: show #{@mt}"
       end
 
       it "should not list the buffers" do
