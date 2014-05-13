@@ -112,6 +112,11 @@ function! s:buffers_refresh()
   setlocal nomodifiable
 endfunction
 
+function! s:folders_search_prompt()
+  let text = input('Search: ')
+  call s:search(text)
+endfunction
+
 function! s:set_map(maps)
   nmapclear <buffer>
   for [key, code] in items(a:maps)
