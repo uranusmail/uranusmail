@@ -33,8 +33,8 @@ module Uranusmail
 
     context "#to_s" do
       it "should give us a string reprentation of a thread" do
-        @mt.to_s.should ==
-          "18.11.09 02:08:10   7 Lars Kellogg-Stedman | [notmuch] Working with Maildir storage? (inbox signed unread)"
+        @mt.to_s.should =~
+          /11-18-09.*7 Lars Kellogg-Stedman.*Working with Maildir.*\(inbox signed unread\)/
       end
     end
 
