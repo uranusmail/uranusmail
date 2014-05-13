@@ -3,10 +3,11 @@ require "mail"
 module Uranusmail
   class Message
 
-    attr_reader :mail
+    attr_reader :mail, :formatted_from
 
     def initialize(filename)
       @mail = Mail.read(filename)
+      @formatted_from = Mail::FromField.new(@mail.header[:from])
     end
 
     def decoded_text_or_html_body

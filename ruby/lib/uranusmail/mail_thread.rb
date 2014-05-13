@@ -59,6 +59,7 @@ module Uranusmail
         a.gsub!(/[\.@].*/, "")
         a.gsub!(/^ext /, "")
         a.gsub!(/ \(.*\)/, "")
+
         a
       end.join(",")
 

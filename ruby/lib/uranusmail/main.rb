@@ -94,15 +94,18 @@ module Uranusmail
           thread.messages.each do |msg|
             date = msg.date.strftime(config[:uranusmail][:date_format])
 
-            buffer.insert("%s %s (%s)" % [msg.from, date, tags])
+            buffer.insert("%s (%s)" % [msg.formatted_from, tags])
             buffer.insert("Subject: %s" % [msg.subject])
             buffer.insert("To: %s" % msg.to)
             buffer.insert("Cc: %s" % msg.cc)
             buffer.insert("Date: %s" % msg.date)
+            buffer.insert("")
 
             msg.decoded_text_or_html_body.each_line do |line|
               buffer.insert(line.chomp)
             end
+
+            buffer.insert("")
           end
         end
       rescue Notmuch::MemoryError

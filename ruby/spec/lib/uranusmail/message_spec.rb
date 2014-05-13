@@ -11,6 +11,10 @@ module Uranusmail
       it "should load the file in mail" do
         @message.mail.should be_instance_of(Mail::Message)
       end
+
+      it "should format the from" do
+        @message.formatted_from.to_s.should == "Carl Worth <cworth@cworth.org>"
+      end
     end
 
     it "should delegate all calls to the mail" do
