@@ -24,8 +24,10 @@ key=value1;value2
     end
 
     it "should use some default config" do
-      @config[:uranusmail][:count_threads].should be_false
-      @config[:uranusmail][:date_format].should == "%d.%m.%y %H:%M:%S"
+      @config[:uranusmail][:count_threads].should ==
+        Config::DEFAULT_CONFIG[:uranusmail][:count_threads]
+      @config[:uranusmail][:date_format].should ==
+        Config::DEFAULT_CONFIG[:uranusmail][:date_format]
     end
   end
 end

@@ -8,11 +8,30 @@ module VIM
     attr_accessor :line_number
     attr_reader :content, :info
 
-    def initialize
+    @@buffers = []
+
+    def initialize(options = {})
+      @@buffers << self
+
       @content = [nil] # VIM buffer index starts at 1
       @line_number = 1
+      @query = options[:query]
 
-      init("")
+      if options[:thread_id]
+        @thread = Uranusmail::MailThread.new(thread_id: options[:thread_id]).to_s
+      end
+    end
+
+    def self.count
+      (@@buffers.size || 0)
+    end
+
+    def self.[](index)
+      @@buffers[index]
+    end
+
+    def self.clear
+      @@buffers = []
     end
 
     def append(_, line)
@@ -54,7 +73,11 @@ end
 
 RSpec.configure do |config|
   config.before do
-    $curbuf = VIM::Buffer.new
+    $curbuf = VIM::Buffer.new.init("folders")
     $curwin = VIM::Window.new
+  end
+
+  config.after do
+    VIM::Buffer.clear
   end
 end

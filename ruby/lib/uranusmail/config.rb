@@ -3,7 +3,7 @@ module Uranusmail
 
     DEFAULT_CONFIG = {
       uranusmail: {
-        date_format: "%d.%m.%y %H:%M:%S",
+        date_format: "%m-%d-%y %H:%M:%S",
         count_threads: false,
       },
     }

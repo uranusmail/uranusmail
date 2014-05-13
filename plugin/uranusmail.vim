@@ -17,6 +17,12 @@ let g:uranusmail_folders_maps = {
   \ ';'       : 'list_buffers()',
   \ }
 
+let g:uranusmail_buffers_maps = {
+  \ 'q'       : 'kill_this_buffer()',
+  \ '<Enter>' : 'open_selected_buffer()',
+  \ '='       : 'buffers_refresh()',
+  \ }
+
 let g:uranusmail_search_maps = {
   \ 'q'       : 'kill_this_buffer()',
   \ '<Enter>' : 'search_show_thread()',
@@ -71,6 +77,41 @@ function! s:set_defaults()
   endif
 endfunction
 
+function! s:list_buffers()
+  if exists('s:search_buffer')
+    ruby VIM::command("buffer #{VIM::evaluate('s:search_buffer')}")
+    call s:buffers_refresh()
+  else
+    call s:new_buffer('buffers')
+    ruby VIM::command("let s:search_buffer=#{$curbuf.number}")
+    ruby $uranusmail.render_buffers_list
+    call s:set_menu_buffer()
+    call s:set_map(g:uranusmail_buffers_maps)
+  endif
+endfunction
+
+function! s:open_selected_buffer()
+ruby << EOF
+  buffers_list_id = $curbuf.number
+  buffer_id = $curbuf.line_info[:buffer_id]
+  VIM::command("buffer #{buffer_id}")
+EOF
+endfunction
+
+function! s:kill_buffer(buffer_id)
+ruby  << EOF
+  buffer_id = VIM::evaluate("a:buffer_id")
+  VIM::Buffer[buffer_id - 1].destroy!
+  VIM::command("bdelete! #{buffer_id}")
+EOF
+endfunction
+
+function! s:buffers_refresh()
+  setlocal modifiable
+  ruby $uranusmail.render_buffers_list
+  setlocal nomodifiable
+endfunction
+
 function! s:set_map(maps)
   nmapclear <buffer>
   for [key, code] in items(a:maps)
@@ -90,9 +131,7 @@ endfunction
 
 function! s:toggle_select_thread()
   setlocal modifiable
-ruby << EOF
-  $curbuf.toggle_select_thread
-EOF
+  ruby $curbuf.toggle_select_thread
   normal j
   setlocal nomodifiable
 endfunction
@@ -104,10 +143,7 @@ function! s:set_menu_buffer()
 endfunction
 
 function! s:folders_show_search()
-ruby << EOF
-  search = $curbuf.line_info[:search]
-  VIM::command("call s:search('#{search}')")
-EOF
+  ruby VIM::command("call s:search('#{$curbuf.line_info[:search]}')")
 endfunction
 
 function! s:cannot_kill_this_buffer()
@@ -116,23 +152,20 @@ endfunction
 
 function! s:kill_this_buffer()
 ruby << EOF
-	$curbuf.destroy!
-	VIM::command("bdelete!")
+  $curbuf.destroy!
+  VIM::command("bdelete!")
 EOF
 endfunction
 
 function! s:show(thread_id)
   call s:new_buffer('show')
-  setlocal modifiable
   ruby $uranusmail.render_thread(VIM::evaluate('a:thread_id'))
   setlocal nomodifiable
   call s:set_map(g:uranusmail_show_maps)
 endfunction
 
 function! s:search_show_thread()
-ruby << EOF
-  VIM::command("call s:show('#{$curbuf.line_info[:thread_id]}')")
-EOF
+  ruby VIM::command("call s:show('#{$curbuf.line_info[:thread_id]}')")
 endfunction
 
 function! s:search(search)
@@ -155,11 +188,7 @@ endfunction
 
 function! s:folders()
   call s:new_buffer('folders')
-
-ruby << EOF
-  $uranusmail.render_folders(VIM::evaluate('g:uranusmail_folders'))
-EOF
-
+  ruby $uranusmail.render_folders(VIM::evaluate('g:uranusmail_folders'))
   call s:set_menu_buffer()
   call s:set_map(g:uranusmail_folders_maps)
 endfunction

@@ -19,10 +19,10 @@ module Uranusmail
 
     context "#decode_body" do
       before do
-        @plain_text_thread = MailThread.new("0000000000000017")
+        @plain_text_thread = MailThread.new(thread_id: "0000000000000017")
         @plain_text_thread.load_messages!
 
-        @html_thread = MailThread.new("0000000000000019")
+        @html_thread = MailThread.new(thread_id: "0000000000000019")
         @html_thread.load_messages!
       end
 

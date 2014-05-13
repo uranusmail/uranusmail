@@ -3,11 +3,18 @@ require "set"
 module VIM
   class Buffer
 
-    attr_accessor :query
+    attr_accessor :query, :type, :thread
 
-    def init(name)
-      @name = name
+    def init(type)
+      @type = type
       @info = [nil] # VIM buffer index starts at 1
+      @uranusmail_buffer = true
+
+      self
+    end
+
+    def uranusmail_buffer?
+      @uranusmail_buffer == true
     end
 
     def line_info

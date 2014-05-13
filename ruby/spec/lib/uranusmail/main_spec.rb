@@ -90,6 +90,45 @@ module Uranusmail
         Main.instance.render_thread(@thread_id)
         $curbuf.content.join("\n").should =~ /Resulted in 4604/
       end
+
+      it "should set the thread into the buffer" do
+        Main.instance.render_thread(@thread_id)
+        @mt = MailThread.new(thread_id: @thread_id)
+
+        $curbuf.thread.should == @mt.to_s
+      end
+    end
+
+    context "#render_buffers_list" do
+      before do
+        @thread_id = "0000000000000001"
+        @mt = MailThread.new(thread_id: @thread_id)
+
+        VIM::Buffer.new(query: "tag:inbox").init("search")
+        VIM::Buffer.new(thread_id: @thread_id).init("show")
+        VIM::Buffer.new.init("buffers")
+        VIM::Buffer.new.init("") # TODO: Figure out why I need this for the spec
+      end
+
+      it "should show the folders buffer" do
+        Main.instance.render_buffers_list
+        $curbuf.content[1].should == "1: folders"
+      end
+
+      it "should show the inbox buffer" do
+        Main.instance.render_buffers_list
+        $curbuf.content[2].should == "2: search (tag:inbox)"
+      end
+
+      it "should show the thread for the show" do
+        Main.instance.render_buffers_list
+        $curbuf.content[3].should == "3: show #{@mt}"
+      end
+
+      it "should not list the buffers" do
+        Main.instance.render_buffers_list
+        $curbuf.content.join("\n").should_not =~ /buffers/
+      end
     end
   end
 end
