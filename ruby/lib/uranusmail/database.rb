@@ -17,8 +17,14 @@ module Uranusmail
       end
     end
 
-    def query(terms)
-      query = super
+    def query(terms, options = {})
+      query = super(terms)
+
+      if options[:omit_excluded_tags]
+        Main.instance.config[:search][:exclude_tags].each do |tag|
+          query.add_tag_exclude(tag)
+        end
+      end
 
       # Prior to Notmuch 0.19, query.count_threads did not exist
       # and we need to load all of the threads to count them
@@ -44,7 +50,11 @@ module Uranusmail
     private
 
     def method_missing(method, *args, &block)
-      @notmuch_database.send(method, *args, &block)
+      if @notmuch_database.respond_to?(method)
+        @notmuch_database.send(method, *args, &block)
+      else
+        super
+      end
     end
   end
 end

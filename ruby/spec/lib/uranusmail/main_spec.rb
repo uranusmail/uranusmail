@@ -79,6 +79,15 @@ module Uranusmail
         $curbuf.unselect_all
         $curbuf.content[2].should =~ /^ .*/
       end
+
+      it "should omit excluded by default" do
+        query = double(search_threads: [])
+
+        Uranusmail::Database.any_instance.should_receive(:query).
+          with("tag:inbox", omit_excluded_tags: true).once.and_return(query)
+
+        Main.instance.render_search("tag:inbox")
+      end
     end
 
     context "#render_thread" do
