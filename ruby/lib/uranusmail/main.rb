@@ -83,7 +83,7 @@ module Uranusmail
         (0...VIM::Buffer.count).each do |buffer_index|
           buffer = VIM::Buffer[buffer_index]
           if buffer && buffer.uranusmail_buffer? && buffer.type != "buffers"
-            line = "%d: %s" % [buffer_index + 1, buffer.type]
+            line = "#{buffer_index+1}: #{buffer.type.ljust(7)}"
 
             line << " (#{buffer.query})" if buffer.query
             line << " #{buffer.thread}"  if buffer.thread
