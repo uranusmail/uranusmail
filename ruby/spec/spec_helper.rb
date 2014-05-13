@@ -15,6 +15,6 @@ RSpec.configure do |config|
   config.order = "random"
 
   config.before do
-    Uranusmail::Main.init(config_file: @config_file)
+    Uranusmail::Main.init(config_file: @config_file.path)
   end
 end

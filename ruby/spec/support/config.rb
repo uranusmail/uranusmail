@@ -16,18 +16,19 @@ def generate_config_file(database_path)
   config_file = Tempfile.new("notmuch-config")
   config_file.write contents
   config_file.flush
+  config_file.close
 
-  config_file.path
+  config_file
 end
 
 RSpec.configure do |config|
   config.before do
     @database_tmp_location = generate_mail_and_database
     @config_file = generate_config_file("#{@database_tmp_location}/database-v1")
-    @config = Uranusmail::Config.new(File.read(@config_file))
   end
 
   config.after do
     FileUtils.remove_entry @database_tmp_location
+    @config_file.close!
   end
 end
