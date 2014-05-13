@@ -126,12 +126,12 @@ module Uranusmail
 
       it "should show the inbox buffer" do
         Main.instance.render_buffers_list
-        $curbuf.content[2].should == "2: search (tag:inbox)"
+        $curbuf.content[2].should == "2: search  (tag:inbox)"
       end
 
       it "should show the thread for the show" do
         Main.instance.render_buffers_list
-        $curbuf.content[3].should == "3: show #{@mt}"
+        $curbuf.content[3].should == "3: show    #{@mt}"
       end
 
       it "should not list the buffers" do
