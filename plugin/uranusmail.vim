@@ -78,17 +78,22 @@ function! s:set_defaults()
 endfunction
 
 function! s:list_buffers()
-  call s:new_buffer('buffers')
-  ruby $uranusmail.render_buffers_list
-  call s:set_menu_buffer()
-  call s:set_map(g:uranusmail_buffers_maps)
+  if exists('s:search_buffer')
+    ruby VIM::command("buffer #{VIM::evaluate('s:search_buffer')}")
+    call s:buffers_refresh()
+  else
+    call s:new_buffer('buffers')
+    ruby VIM::command("let s:search_buffer=#{$curbuf.number}")
+    ruby $uranusmail.render_buffers_list
+    call s:set_menu_buffer()
+    call s:set_map(g:uranusmail_buffers_maps)
+  endif
 endfunction
 
 function! s:open_selected_buffer()
 ruby << EOF
   buffers_list_id = $curbuf.number
   buffer_id = $curbuf.line_info[:buffer_id]
-  VIM::command("call s:kill_this_buffer()")
   VIM::command("buffer #{buffer_id}")
 EOF
 endfunction
