@@ -46,19 +46,19 @@ module Uranusmail
       threads = $curbuf.query.search_threads
 
       $curbuf.continous_render(threads) do |buffer, threads|
-        threads.each do |thread|
-          line = thread_line(thread)
+        threads.each do |db_entry|
+          thread = MailThread.new(db_entry: db_entry)
+          line = " #{thread.to_s}"
           buffer.insert line, {thread_id: thread.thread_id}
         end
       end
     end
 
     def render_thread(thread_id, options = {})
-      thread = MailThread.new(thread_id)
+      thread = MailThread.new(thread_id: thread_id)
       thread.load_messages!
 
-      tags = ""
-      thread.load { |t| tags = t.tags.map(&:to_s).join(" ") }
+      tags = thread.db_entry.tags.map(&:to_s).join(" ")
 
       $curbuf.render do |buffer|
         thread.messages.each do |msg|
@@ -94,25 +94,6 @@ module Uranusmail
 
     def count_threads?
       config[:uranusmail][:count_threads] == "true"
-    end
-
-    def thread_line(thread)
-      authors = thread.authors.force_encoding("utf-8").split(/[,|]/).map do |a|
-        a.strip!
-        a.gsub!(/[\.@].*/, "")
-        a.gsub!(/^ext /, "")
-        a.gsub!(/ \(.*\)/, "")
-        a
-      end.join(",")
-
-      date = Time.at(thread.newest_date).strftime(config[:uranusmail][:date_format])
-      subject = thread.messages.first['subject']
-      subject = Mail::Field.new("Subject: " + subject).to_s
-
-      tags = thread.tags.map(&:to_s).join(" ")
-
-      " %-12s %3s %-20.20s | %s (%s)" % [date, thread.matched_messages,
-                                         authors, subject, tags]
     end
   end
 end

@@ -3,33 +3,44 @@ require "spec_helper"
 module Uranusmail
   describe MailThread do
     before do
-      @thread_db = Uranusmail.database.query("thread:0000000000000001").search_threads.first
-      @thread = MailThread.new(@thread_db.thread_id)
+      @thread_id = "0000000000000001"
+      @db_entry = Uranusmail.database.query("thread:#{@thread_id}").search_threads.first
+      @mt = MailThread.new(thread_id: @thread_id)
     end
 
-    it "should have an id" do
-      @thread.id.should_not be_nil
-    end
+    context "#initialize" do
+      it "should load the entry given the id" do
+        @mt = MailThread.new(thread_id: @thread_id)
+        @mt.db_entry.should be_instance_of Notmuch::Thread
+      end
 
-    context "#load" do
-      it "should load the thread and yield it" do
-        @thread.load do |thread|
-          thread.tags.to_a.should_not be_nil
-          thread.tags.to_a.should include("inbox")
-        end
+      it "should load the thread id given the db_entry" do
+        @mt = MailThread.new(db_entry: @db_entry)
+        @mt.thread_id.should == @thread_id
+      end
+
+      it "should raise an error if none given" do
+        expect { MailThread.new }.to raise_error(ArgumentError)
       end
     end
 
     context "#load_messages!" do
       it "should loads messages" do
-        @thread.load_messages!
-        @thread.messages.count.should == 7
+        @mt.load_messages!
+        @mt.messages.count.should == 7
+      end
+    end
+
+    context "#to_s" do
+      it "should give us a string reprentation of a thread" do
+        @mt.to_s.should ==
+          "18.11.09 02:08:10   7 Lars Kellogg-Stedman | [notmuch] Working with Maildir storage? (inbox signed unread)"
       end
     end
 
     context "#archive!" do
       it "should remove the inbox from the thread" do
-        @thread.archive!
+        @mt.archive!
         thread = Uranusmail.database.query("thread:0000000000000001").search_threads.first
         thread.tags.to_a.should_not include("inbox")
       end
@@ -37,7 +48,7 @@ module Uranusmail
 
     context "#archive_and_read!" do
       it "should archive a thread and mark it as read" do
-        @thread.archive_and_read!
+        @mt.archive_and_read!
         thread = Uranusmail.database.query("thread:0000000000000001").search_threads.first
         thread.tags.to_a.should_not include("inbox")
         thread.tags.to_a.should_not include("unread")
