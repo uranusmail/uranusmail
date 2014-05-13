@@ -25,57 +25,93 @@ module Uranusmail
     end
 
     def render_folders(folders, options = {})
-      $curbuf.render do |buffer|
-        folders.each do |name, search|
-          Uranusmail.database.query(search) do |query|
-            if count_threads?
-              count = query.count_threads
-            else
-              count = query.count_messages
-            end
+      begin
+        retried = false
 
-            line = "%9d %-20s (%s)" % [count, name, search]
-            buffer.insert line, {search: search}
+        $curbuf.render do |buffer|
+          folders.each do |name, search|
+            Uranusmail.database.query(search) do |query|
+              if count_threads?
+                count = query.count_threads
+              else
+                count = query.count_messages
+              end
+
+              line = "%9d %-20s (%s)" % [count, name, search]
+              buffer.insert line, {search: search}
+            end
           end
+        end
+      rescue Notmuch::MemoryError
+        if retried
+          raise
+        else
+          retried = true
+          Uranusmail.database.open_or_reopen
+          retry
         end
       end
     end
 
     def render_search(search, options = {})
-      options[:omit_excluded_tags] ||= true
+      begin
+        retried = false
 
-      $curbuf.query ||= Uranusmail.database.query(search, options)
-      threads = $curbuf.query.search_threads
+        options[:omit_excluded_tags] ||= true
 
-      $curbuf.continous_render(threads) do |buffer, threads|
-        threads.each do |db_entry|
-          thread = MailThread.new(db_entry: db_entry)
-          line = " #{thread}"
-          buffer.insert line, {thread_id: thread.thread_id}
+        $curbuf.query ||= Uranusmail.database.query(search, options)
+        threads = $curbuf.query.search_threads
+
+        $curbuf.continous_render(threads) do |buffer, threads|
+          threads.each do |db_entry|
+            thread = MailThread.new(db_entry: db_entry)
+            line = " #{thread}"
+            buffer.insert line, {thread_id: thread.thread_id}
+          end
+        end
+      rescue Notmuch::MemoryError
+        if retried
+          raise
+        else
+          retried = true
+          Uranusmail.database.open_or_reopen
+          retry
         end
       end
     end
 
     def render_thread(thread_id, options = {})
-      thread = MailThread.new(thread_id: thread_id)
-      thread.load_messages!
+      begin
+        retried = false
 
-      tags = thread.db_entry.tags.map(&:to_s).join(" ")
-      $curbuf.thread = thread.to_s
+        thread = MailThread.new(thread_id: thread_id)
+        thread.load_messages!
 
-      $curbuf.render do |buffer|
-        thread.messages.each do |msg|
-          date = msg.date.strftime(config[:uranusmail][:date_format])
+        tags = thread.db_entry.tags.map(&:to_s).join(" ")
+        $curbuf.thread = thread.to_s
 
-          buffer.insert("%s %s (%s)" % [msg.from, date, tags])
-          buffer.insert("Subject: %s" % [msg.subject])
-          buffer.insert("To: %s" % msg.to)
-          buffer.insert("Cc: %s" % msg.cc)
-          buffer.insert("Date: %s" % msg.date)
+        $curbuf.render do |buffer|
+          thread.messages.each do |msg|
+            date = msg.date.strftime(config[:uranusmail][:date_format])
 
-          msg.decoded_text_or_html_body.each_line do |line|
-            buffer.insert(line.chomp)
+            buffer.insert("%s %s (%s)" % [msg.from, date, tags])
+            buffer.insert("Subject: %s" % [msg.subject])
+            buffer.insert("To: %s" % msg.to)
+            buffer.insert("Cc: %s" % msg.cc)
+            buffer.insert("Date: %s" % msg.date)
+
+            msg.decoded_text_or_html_body.each_line do |line|
+              buffer.insert(line.chomp)
+            end
           end
+        end
+      rescue Notmuch::MemoryError
+        if retried
+          raise
+        else
+          retried = true
+          Uranusmail.database.open_or_reopen
+          retry
         end
       end
     end
