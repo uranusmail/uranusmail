@@ -42,7 +42,9 @@ module Uranusmail
     end
 
     def render_search(search, options = {})
-      $curbuf.query ||= Uranusmail.database.query(search)
+      options[:omit_excluded_tags] ||= true
+
+      $curbuf.query ||= Uranusmail.database.query(search, options)
       threads = $curbuf.query.search_threads
 
       $curbuf.continous_render(threads) do |buffer, threads|

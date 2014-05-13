@@ -6,6 +6,14 @@ module Uranusmail
         date_format: "%m-%d-%y %H:%M:%S",
         count_threads: false,
       },
+
+      search: {
+        exclude_tags: [
+          "deleted",
+          "spam",
+          "killed"
+        ],
+      }
     }
 
     attr_reader :contents

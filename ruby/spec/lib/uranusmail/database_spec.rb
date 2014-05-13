@@ -1,4 +1,5 @@
 require "spec_helper"
+require "notmuch"
 
 module Uranusmail
   describe Database do
@@ -21,6 +22,15 @@ module Uranusmail
         query = @db.query("tag:inbox") do |q|
           q.count_messages.should == 52
         end.should be_nil
+      end
+
+      it "should exclude the excluded folders" do
+        Uranusmail.main.config[:search][:exclude_tags].each do |tag|
+          Notmuch::Query.any_instance.should_receive(:add_tag_exclude).
+            with(tag).once
+        end
+
+        query = @db.query("tag:inbox", omit_excluded_tags: true)
       end
     end
 
