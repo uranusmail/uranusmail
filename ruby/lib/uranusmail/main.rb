@@ -47,22 +47,7 @@ module Uranusmail
 
       $curbuf.continous_render(threads) do |buffer, threads|
         threads.each do |thread|
-          authors = thread.authors.force_encoding("utf-8").split(/[,|]/).map do |a|
-            a.strip!
-            a.gsub!(/[\.@].*/, "")
-            a.gsub!(/^ext /, "")
-            a.gsub!(/ \(.*\)/, "")
-            a
-          end.join(",")
-
-          date = Time.at(thread.newest_date).strftime(options[:date_fmt])
-          subject = thread.messages.first['subject']
-          subject = Mail::Field.new("Subject: " + subject).to_s
-
-          tags = thread.tags.map(&:to_s).join(" ")
-
-          line = " %-12s %3s %-20.20s | %s (%s)" % [date, thread.matched_messages,
-                                                   authors, subject, tags]
+          line = thread_line(thread)
           buffer.insert line, {thread_id: thread.thread_id}
         end
       end
@@ -77,7 +62,7 @@ module Uranusmail
 
       $curbuf.render do |buffer|
         thread.messages.each do |msg|
-          date = msg.date.strftime(options[:date_fmt])
+          date = msg.date.strftime(config[:uranusmail][:date_format])
 
           buffer.insert("%s %s (%s)" % [msg.from, date, tags])
           buffer.insert("Subject: %s" % [msg.subject])
@@ -108,7 +93,26 @@ module Uranusmail
     private
 
     def count_threads?
-      config[:vim][:count_threads] == "true"
+      config[:uranusmail][:count_threads] == "true"
+    end
+
+    def thread_line(thread)
+      authors = thread.authors.force_encoding("utf-8").split(/[,|]/).map do |a|
+        a.strip!
+        a.gsub!(/[\.@].*/, "")
+        a.gsub!(/^ext /, "")
+        a.gsub!(/ \(.*\)/, "")
+        a
+      end.join(",")
+
+      date = Time.at(thread.newest_date).strftime(config[:uranusmail][:date_format])
+      subject = thread.messages.first['subject']
+      subject = Mail::Field.new("Subject: " + subject).to_s
+
+      tags = thread.tags.map(&:to_s).join(" ")
+
+      " %-12s %3s %-20.20s | %s (%s)" % [date, thread.matched_messages,
+                                         authors, subject, tags]
     end
   end
 end
